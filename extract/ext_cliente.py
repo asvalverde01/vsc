@@ -1,3 +1,4 @@
+# Archivo: extract/ext_cliente.py
 import traceback
 from util.db_connection import Db_Connection
 import pandas as pd
@@ -29,6 +30,5 @@ def extract_cliente():
         traceback.print_exc()
     finally:
         # Cerrar conexión
-        con_db.close()
+        pass
 
-# Puedes replicar este patrón para otras tablas en archivos separados
