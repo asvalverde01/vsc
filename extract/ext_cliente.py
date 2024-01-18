@@ -1,34 +1,27 @@
-# Archivo: extract/ext_cliente.py
+# extract/ext_cliente.py
 import traceback
 from util.db_connection import Db_Connection
+from util.db_config import DatabaseConfig
 import pandas as pd
 
-def extract_cliente():
+def extract_cliente(db_type='oltp'):
     try:
-        # Configuración de conexión
-        type = 'mysql'
-        host = '10.10.10.2'
-        port = '3306'
-        user = 'dwh'
-        pwd = 'elcaro_4U'
-        db = 'oltp'
+        config = DatabaseConfig.DATABASES.get(db_type)
 
-        con_db = Db_Connection(type, host, port, user, pwd, db)
+        if config is None:
+            raise Exception(f"Invalid database type: {db_type}")
+
+        con_db = Db_Connection(db_type)
         ses_db = con_db.start()
 
-        if ses_db == -1:
-            raise Exception(f"El tipo de base de datos {type} no es válido")
-        elif ses_db == -2:
-            raise Exception("Error al establecer la conexión de pruebas")
+        if ses_db is None:
+            raise Exception(f"Unable to establish a {db_type} database connection")
 
-        # Extracción de datos
         cliente_data = pd.read_sql('SELECT * FROM Cliente', ses_db)
-
         return cliente_data
 
-    except:
+    except Exception as e:
         traceback.print_exc()
     finally:
-        # Cerrar conexión
-        pass
-
+        if ses_db:
+            ses_db.dispose()

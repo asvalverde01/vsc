@@ -1,19 +1,20 @@
 import traceback
-from util.db_connection import Db_Connection
 import pandas as pd
+from util.db_connection import Db_Connection
+from util.db_config import DatabaseConfig
 
-def transformar_ubicacion():
+def transformar_ubicacion(db_type='staging'):
 
     try:
-        type = 'mysql'
-        host = '10.10.10.2'
-        port = '3306'
-        user = 'dwh'
-        pwd = 'elcaro_4U'
-        db = 'staging'
+        config = DatabaseConfig.DATABASES.get(db_type)
 
-        con_db = Db_Connection(type, host, port, user, pwd, db)
+        if config is None:
+            raise Exception(f"Invalid database type: {db_type}")
+
+        # Iniciar conexión a la base de datos
+        con_db = Db_Connection(db_type)
         ses_db = con_db.start()
+        
         if ses_db == -1:
             raise Exception(f"El tipo de base de datos {type} no es válido")
         elif ses_db == -2:
