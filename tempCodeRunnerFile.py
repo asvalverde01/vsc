@@ -19,14 +19,6 @@ from transform.transformar import (
     transformar_medicion_volumenes_venta,
 
 )
-from load.load_cliente import cargar_dim_cliente
-from load.load_contratacion import cargar_dim_contratacion
-from load.load_proveedor import cargar_dim_proveedor
-from load.load_servicio_publicitario import cargar_dim_servicio_publicitario
-from load.load_ubicacion import cargar_dim_ubicacion
-from load.load_venta import cargar_fact_venta
-
-
 
 def persist_and_print(dataframe, table_name, message):
     persistir_staging(dataframe, table_name)
@@ -53,13 +45,8 @@ try:
     persist_and_print(transformar_venta(), 'tra_Venta', 'Datos de Venta')
     persist_and_print(transformar_cliente(), 'tra_Cliente', 'Datos de Cliente')
 
-    cargar_dim_cliente()
-    cargar_dim_contratacion()
-    cargar_dim_proveedor()
-    cargar_dim_servicio_publicitario()
-    cargar_dim_ubicacion()
-    cargar_fact_venta()
-
+    # cargar_sor()
+    # print('Datos de Staging cargados al Sor')
 
 except Exception as e:
     traceback.print_exc()

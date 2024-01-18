@@ -23,28 +23,32 @@ def transformar_venta(db_type='staging'):
         # Consulta SQL ajustada para realizar la transformación de la tabla tra_Venta
         sql_stmt = """
             SELECT
-                v.ID_Venta,
-                v.ID_Cliente,
-                v.ID_Proveedor,
-                v.ID_Servicio,
-                v.ID_Ubicacion,
-                v.ID_Empleado,
+                c.Nombre AS Cliente,
+                p.Nombre AS Proveedor,
+                s.Nombre AS Servicio,
+                u.Ciudad AS Ciudad,
+                u.Sector AS Sector,
                 v.ID_Factura,
                 v.Fecha,
                 v.Monto,
                 v.DuracionAnuncio,
-                v.Comentarios,
                 -- Columnas adicionales de tra_Tasa_Recompra y/o tra_Medicion_Volumenes_Venta
                 -- Ajusta según tus necesidades
-                tr.ClientesRecurrentes,
-                mv.FacturacionTotal,
-                mv.ClientesUnicos
+                tr.ClientesRecurrentes
             FROM
                 ext_Venta v
             LEFT JOIN
                 tra_Tasa_Recompra tr ON (v.ID_Proveedor = tr.ID_Proveedor)
             LEFT JOIN
                 tra_Medicion_Volumenes_Venta mv ON (YEAR(v.Fecha) = mv.Anio)
+            LEFT JOIN
+                ext_Cliente c ON (v.ID_Cliente = c.ID_Cliente)
+            LEFT JOIN
+                ext_Proveedor p ON (v.ID_Proveedor = p.ID_Proveedor)
+            LEFT JOIN
+                ext_Servicio_Publicitario s ON (v.ID_Servicio = s.ID_Servicio)
+            LEFT JOIN
+                ext_Ubicacion u ON (v.ID_Ubicacion = u.ID_Ubicacion)
         """
 
         # Realizar la transformación y obtener el DataFrame resultante
@@ -54,5 +58,4 @@ def transformar_venta(db_type='staging'):
 
     except:
         traceback.print_exc()
-    finally:
-        pass
+        return None

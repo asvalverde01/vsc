@@ -39,7 +39,6 @@ def transformar_servicio_publicitario(db_type='staging'):
 
         # Realizar la transformación y obtener el DataFrame resultante
         servicio_publicitario_tra = pd.read_sql(sql_stmt, ses_db)
-
         return servicio_publicitario_tra
 
     except:

@@ -23,18 +23,21 @@ def transformar_contratacion(db_type='staging'):
         # Consulta SQL para realizar la transformación de la tabla tra_Contratacion
         sql_stmt = """
             SELECT
-                c.ID_Proveedor,
+                p.Nombre AS Proveedor,
                 c.Area_Elevision,
-                c.Fecha,
+                DAY(c.Fecha) AS Dia,
+                MONTH(c.Fecha) AS Mes,
+                YEAR(c.Fecha) AS Anio,
                 c.Tipo_Servicio,
-                c.Duracion,
-                c.Comentarios,
+                c.Duracion AS Dias_Duracion,
                 -- Columnas adicionales de tra_Info_Contratacion
                 ic.Contrataciones
             FROM
                 ext_Contratacion c
             LEFT JOIN
                 tra_Info_Contratacion ic ON (c.ID_Proveedor = ic.ID_Proveedor AND c.Area_Elevision = ic.Area_Elevision AND c.Tipo_Servicio = ic.Tipo_Servicio)
+            LEFT JOIN
+                ext_Proveedor p ON c.ID_Proveedor = p.ID_Proveedor
         """
 
         # Realizar la transformación y obtener el DataFrame resultante
@@ -44,6 +47,4 @@ def transformar_contratacion(db_type='staging'):
 
     except:
         traceback.print_exc()
-    finally:
-        pass
-
+        return None

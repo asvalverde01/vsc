@@ -23,18 +23,19 @@ def transformar_proveedor(db_type='staging'):
         # Consulta SQL para realizar la transformación de la tabla tra_Proveedor
         sql_stmt = """
             SELECT
-                p.ID_Proveedor,
-                p.Nombre,
+                p.Nombre AS Proveedor,
                 p.Ubicacion,
                 p.ContactoNombre,
-                p.ContactoEmail,
-                p.ContactoTelefono,
                 -- Columnas adicionales de tra_Info_Contratacion
                 ic.Contrataciones
             FROM
                 ext_Proveedor p
             LEFT JOIN
                 tra_Info_Contratacion ic ON (p.ID_Proveedor = ic.ID_Proveedor)
+            LEFT JOIN
+                ext_Contratacion c ON (p.ID_Proveedor = c.ID_Proveedor)
+            GROUP BY
+                p.Nombre, p.Ubicacion, p.ContactoNombre, ic.Contrataciones
         """
 
         # Realizar la transformación y obtener el DataFrame resultante
@@ -44,5 +45,4 @@ def transformar_proveedor(db_type='staging'):
 
     except:
         traceback.print_exc()
-    finally:
-        pass
+        return None

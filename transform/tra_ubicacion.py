@@ -14,7 +14,7 @@ def transformar_ubicacion(db_type='staging'):
         # Iniciar conexión a la base de datos
         con_db = Db_Connection(db_type)
         ses_db = con_db.start()
-        
+
         if ses_db == -1:
             raise Exception(f"El tipo de base de datos {type} no es válido")
         elif ses_db == -2:
@@ -22,23 +22,20 @@ def transformar_ubicacion(db_type='staging'):
         
         sql_stmt = """
             SELECT
-                u.ID_Ubicacion,
                 u.Ciudad,
                 u.Sector,
-                u.Latitud,
-                u.Longitud,
-                -- Columnas adicionales de tra_Datos_Ventas y/o tra_Medicion_Volumenes_Venta
-                -- Ajusta según tus necesidades
-                dv.Monto,
-                dv.CantidadVentas,
-                mv.FacturacionTotal,
-                mv.ClientesUnicos
+                ROUND(COALESCE(SUM(ev.Monto), 0), 2) AS MontoTotal,
+                COALESCE(COUNT(ev.ID_Venta), 0) AS VentasTotales,
+                COUNT(DISTINCT CASE WHEN tr.ClientesRecurrentes > 0 THEN ev.ID_Cliente END) AS ClientesRecurrentes,
+                COUNT(DISTINCT CASE WHEN tr.ClientesRecurrentes IS NULL THEN ev.ID_Cliente END) AS ClientesUnicosNuevos
             FROM
                 ext_Ubicacion u
             LEFT JOIN
-                tra_Datos_Ventas dv ON (u.Ciudad = dv.Ciudad)
+                ext_Venta ev ON u.ID_Ubicacion = ev.ID_Ubicacion
             LEFT JOIN
-                tra_Medicion_Volumenes_Venta mv ON (u.Sector = mv.Sector)
+                tra_Tasa_Recompra tr ON ev.ID_Servicio = tr.ID_Proveedor
+            GROUP BY
+                u.Ciudad, u.Sector
         """
 
         ubicacion_tra = pd.read_sql(sql_stmt, ses_db)
@@ -47,5 +44,4 @@ def transformar_ubicacion(db_type='staging'):
 
     except:
         traceback.print_exc()
-    finally:
-        pass
+        return None

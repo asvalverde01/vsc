@@ -3,7 +3,7 @@ from util.db_connection import Db_Connection
 from util.db_config import DatabaseConfig
 import pandas as pd
 
-def persistir_staging (df_stg, tab_name, db_type='oltp'):
+def persistir_staging (df_stg, tab_name, db_type='staging'):
 
     try:
         config = DatabaseConfig.DATABASES.get(db_type)
